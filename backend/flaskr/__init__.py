@@ -36,11 +36,14 @@ def create_app(test_config=None):
   @app.after_request
   def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    #wondering if I need to add something here to allow the "include" for adding questions... will look into that
+    #and yep adding the last one above seemed to allow the question form to get submitted to server.. but whhhhy?
     return response
   
   #GET request to get a list of all the category names and their ids
-  @app.route('/api/categories')
+  @app.route('/api/categories',methods=["GET"])
   def getCategories():
     categories = Category.query.order_by(Category.id).all()
     print("categories are:",categories)
@@ -132,7 +135,8 @@ def create_app(test_config=None):
   
 
   @app.route('/api/questions', methods=["POST"])
-  def addQuestion(request):
+  def addQuestion():
+    #initially had request fed into the function above, testing what happens if take it out
 
     body = request.get_json()
 
@@ -141,8 +145,13 @@ def create_app(test_config=None):
     new_difficulty = body.get('difficulty',None)
     new_category = body.get('category',None)
 
+    #need to convert the category to a number first?
+
+    print("This is the body of the request",body)
+
     try:
       newQuestion = Question(question=new_question,answer=new_answer,category=new_category,difficulty=new_difficulty)
+      print("Here is the new question",newQuestion)
       newQuestion.insert()
 
       return jsonify({

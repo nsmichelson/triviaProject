@@ -38,6 +38,7 @@ class FormView extends Component {
 
   submitQuestion = (event) => {
     event.preventDefault();
+    console.log("The submitquestion function thing is running that was in teh formview.js file")
     $.ajax({
       url: 'http://127.0.0.1:5000/api/questions', //TODO: update request URL
       type: "POST",
