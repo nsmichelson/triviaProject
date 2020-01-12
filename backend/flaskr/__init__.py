@@ -91,15 +91,23 @@ def create_app(test_config=None):
 
     categories = Category.query.all()
 
-    formatted_categories = [category.format() for category in categories]
-    category_items = [category.type for category in categories]    
+    #formatted_categories = [category.format() for category in categories]
+
+    #category_items = [(category.id, category.type) for category in categories]
+
+    #formatted_categories = [category.format() for category in categories]
+    #category_items = [(category['id'],category['type']) for category in formatted_categories]    
+   # "categories": 
       
+    categoriesReturn = {category.id : category.type for category in categories} 
+    print("TEST")
+    print(categoriesReturn)
     return jsonify({
       "success":True,
       "questions": current_questions,
       "totalQuestions": len(Question.query.all()),
-      "categories":category_items,
-      "currentCategory": ''
+      "categories":categoriesReturn,
+      "current_category": list(set([question['category'] for question in current_questions]))
     })
 
 
@@ -137,6 +145,8 @@ def create_app(test_config=None):
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
+
+  @app.route('/categories/int:category_id/questions', methods=['GET'])
 
   TEST: In the "List" tab / main screen, clicking on one of the 
   categories in the left column will cause only questions of that 
