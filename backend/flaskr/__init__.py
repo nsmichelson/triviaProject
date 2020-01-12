@@ -83,10 +83,23 @@ def create_app(test_config=None):
     if len(current_questions)==0:
       abort(404)
 
+    categoryList = []
+
+    for question in current_questions:
+      if question['category'] not in categoryList:
+        categoryList.append(question['category'])
+
+    categories = Category.query.all()
+
+    formatted_categories = [category.format() for category in categories]
+    category_items = [category.type for category in categories]    
+      
     return jsonify({
       "success":True,
       "questions": current_questions,
-      "total_questions": len(Question.query.all())
+      "totalQuestions": len(Question.query.all()),
+      "categories":category_items,
+      "currentCategory": ''
     })
 
 
