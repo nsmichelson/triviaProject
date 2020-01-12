@@ -118,7 +118,7 @@ def create_app(test_config=None):
 
       selection = Question.query.order_by(Question.id).all()
       print("This is the selection",selection)
-      
+
       current_questions = paginate_questions(request,selection)
 
       #Question.close()   --- does this need to be here?
@@ -129,6 +129,30 @@ def create_app(test_config=None):
         })
     except:
       abort(422)
+  
+
+  @app.route('/api/questions', methods=["POST"])
+  def addQuestion(request):
+
+    body = request.get_json()
+
+    new_question = body.get('question',None)
+    new_answer = body.get('answer',None)
+    new_difficulty = body.get('difficulty',None)
+    new_category = body.get('category',None)
+
+    try:
+      newQuestion = Question(question=new_question,answer=new_answer,category=new_category,difficulty=new_difficulty)
+      newQuestion.insert()
+
+      return jsonify({
+        "success":True,
+        })
+        
+    except:
+      abort(422)
+
+    
   
   
   return app
