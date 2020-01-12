@@ -90,14 +90,6 @@ def create_app(test_config=None):
         categoryList.append(question['category'])
 
     categories = Category.query.all()
-
-    #formatted_categories = [category.format() for category in categories]
-
-    #category_items = [(category.id, category.type) for category in categories]
-
-    #formatted_categories = [category.format() for category in categories]
-    #category_items = [(category['id'],category['type']) for category in formatted_categories]    
-   # "categories": 
       
     categoriesReturn = {category.id : category.type for category in categories} 
     print("TEST")
@@ -109,68 +101,35 @@ def create_app(test_config=None):
       "categories":categoriesReturn,
       "current_category": list(set([question['category'] for question in current_questions]))
     })
+  
 
+  #route to delete a specific question  
+  @app.route('/api/questions/<int:question_id>', methods=["DELETE"])
+  def deleteQuestion(question_id):
+    try:
+      question = Question.query.filter(Question.id == question_id).one_or_none()
+      print("This is the question to delete")
+      
+      if question is None:
+        abort(404)
+        
+      question.delete()
+      print("question was deleted")
 
+      selection = Question.query.order_by(Question.id).all()
+      print("This is the selection",selection)
+      
+      current_questions = paginate_questions(request,selection)
 
-  '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
+      #Question.close()   --- does this need to be here?
 
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-  '''
-
-  '''
-  @TODO: 
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
-  category, and difficulty score.
-
-  TEST: When you submit a question on the "Add" tab, 
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
-  '''
-
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
-
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
-
-  '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
-
-  @app.route('/categories/int:category_id/questions', methods=['GET'])
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
-
-
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-  '''
-
-  '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
-  '''
+      return jsonify({
+        "success":True,
+        "questions":current_questions
+        })
+    except:
+      abort(422)
+  
   
   return app
 
