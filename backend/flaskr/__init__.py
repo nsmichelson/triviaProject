@@ -64,20 +64,7 @@ def create_app(test_config=None):
       "categories":CategoriesFormatted
     })
 
-
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
-
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
-  '''
-
+  #GET request to retrieve all the trivia questions (for main page)
   @app.route('/api/questions')
   def getQuestions():
     selection = Question.query.order_by(Question.id).all()
@@ -132,62 +119,37 @@ def create_app(test_config=None):
         })
     except:
       abort(422)
-  
 
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-  '''
-  #need to figure this one out
-
-
-  '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
-
-  @app.route('/categories/int:category_id/questions', methods=['GET'])
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
 
   @app.route('/api/categories/<int:category_id>/questions',methods=['GET'])
   def qforcategory(category_id):
-    selection = Question.query.filter(Category.id=category_id)
+    print("This is the category id we are looking at",category_id)
+    selection = Question.query.filter(Category.id==category_id)
+    #above query is not actually effectively querrying for category id... why?
+    
+    for thing in selection:
+      print(thing)
+    #print(Artist.query.filter(Artist.id==artistID, Shows.id==1)[0].name)
+    print("This is the selection",selection[0].question)
+    print("This is the selection",selection[1].question)
     current_questions = paginate_questions(request,selection)
+    for question in current_questions:
+      print(question)
 
     return jsonify({
       "success":True,
       "questions":current_questions
 
     })
-  #print(Artist.query.filter(Artist.id==artistID, Shows.id==1)[0].name)
 
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
-
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
+ 
 
   #STILL NEED TO FIX THIS ONE BELOW!!!!!!!!!
   @app.route('/api/questions', methods=["POST"])
   def addQuestion():
     #initially had request fed into the function above, testing what happens if take it out
-    if searchterm:
-      searchterm = request.get_json().get('searchTerm')
+    if query:
+      searchterm = request.get_json().get('query').value
       selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(searchterm)))
         #selection = Book.query.order_by(Book.id).filter(or_(Book.title.ilike('%{}%'.format(search)), Book.author.ilike('%{}%'.format(search))))
       current_questions = paginate_questions(request, selection)
@@ -221,7 +183,6 @@ def create_app(test_config=None):
       try:
         newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
         print("Here is the new question",newQuestion)
-        print("About to paste teh qualities of the question")
         print(newQuestion.id)
         print(newQuestion.question)
         print(newQuestion.answer)
@@ -239,6 +200,31 @@ def create_app(test_config=None):
       except:
         print("something went wrong")
         abort(422)
+  
+  
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+      "success": False, 
+      "error": 404,
+      "message": "resource not found"
+      }), 404
+
+  @app.errorhandler(422)
+  def unprocessable(error):
+    return jsonify({
+      "success": False, 
+      "error": 422,
+      "message": "unprocessable"
+      }), 422
+
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      "success": False, 
+      "error": 400,
+      "message": "bad request"
+      }), 400
 
     
   
