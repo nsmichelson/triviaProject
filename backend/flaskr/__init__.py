@@ -134,47 +134,111 @@ def create_app(test_config=None):
       abort(422)
   
 
+  '''
+  @TODO: 
+  Create a POST endpoint to get questions to play the quiz. 
+  This endpoint should take category and previous question parameters 
+  and return a random questions within the given category, 
+  if provided, and that is not one of the previous questions. 
+
+  TEST: In the "Play" tab, after a user selects "All" or a category,
+  one question at a time is displayed, the user is allowed to answer
+  and shown whether they were correct or not. 
+  '''
+  #need to figure this one out
+
+
+  '''
+  @TODO: 
+  Create a GET endpoint to get questions based on category. 
+
+  @app.route('/categories/int:category_id/questions', methods=['GET'])
+
+  TEST: In the "List" tab / main screen, clicking on one of the 
+  categories in the left column will cause only questions of that 
+  category to be shown. 
+  '''
+
+  @app.route('/api/categories/<int:category_id>/questions',methods=['GET'])
+  def qforcategory(category_id):
+    selection = Question.query.filter(Category.id=category_id)
+    current_questions = paginate_questions(request,selection)
+
+    return jsonify({
+      "success":True,
+      "questions":current_questions
+
+    })
+  #print(Artist.query.filter(Artist.id==artistID, Shows.id==1)[0].name)
+
+  '''
+  @TODO: 
+  Create a POST endpoint to get questions based on a search term. 
+  It should return any questions for whom the search term 
+  is a substring of the question. 
+
+  TEST: Search by any phrase. The questions list will update to include 
+  only question that include that string within their question. 
+  Try using the word "title" to start. 
+  '''
+
+  #STILL NEED TO FIX THIS ONE BELOW!!!!!!!!!
   @app.route('/api/questions', methods=["POST"])
   def addQuestion():
     #initially had request fed into the function above, testing what happens if take it out
-
-    body = request.get_json()
-
-    new_question = body.get('question',None)
-    print("new_question is",new_question)
-    new_answer = body.get('answer',None)
-    new_difficulty = body.get('difficulty',None)
-    #new_category = body.get('category',None)
-    new_category = "Science"
-    #need to fix the above... as it turns out the category does need to be stored in the database as a string
-
-    #need to convert the category to a number first?
-
-    print("This is the body of the request",body)
-
-    try:
-      newQuestion = Question(new_question, new_answer, new_category, new_difficulty)
-      print("Here is the new question",newQuestion)
-      print("About to paste teh qualities of the question")
-      print(newQuestion.id)
-      print(newQuestion.question)
-      print(newQuestion.answer)
-      print(newQuestion.category)
-      print(newQuestion.difficulty)
-      print("about to do the insert")
-      #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
-      newQuestion.insert()
-      print("just did the insert function")
-      formattedQ = newQuestion.format()
-      print("formatted Q is",formattedQ)
-
+    if searchterm:
+      searchterm = request.get_json().get('searchTerm')
+      selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(searchterm)))
+        #selection = Book.query.order_by(Book.id).filter(or_(Book.title.ilike('%{}%'.format(search)), Book.author.ilike('%{}%'.format(search))))
+      current_questions = paginate_questions(request, selection)
+      
       return jsonify({
-        "success":True,
-        "created":newQuestion.id
+        'success': True,
+        'questions': current_questions
         })
-        
-    except:
-      abort(422)
+
+    else:
+      body = request.get_json()
+
+
+      new_question = "Bugsy???"
+      new_answer = "Amadeus??"
+      new_difficulty = 1
+
+
+      #new_question = body.get('question',None)
+      print("new_question is",new_question)
+      #new_answer = body.get('answer',None)
+      #new_difficulty = body.get('difficulty',None)
+      #new_category = body.get('category',None)
+      new_category = "Science"
+      #need to fix the above... as it turns out the category does need to be stored in the database as a string
+
+      #need to convert the category to a number first?
+
+      print("This is the body of the request",body)
+
+      try:
+        newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+        print("Here is the new question",newQuestion)
+        print("About to paste teh qualities of the question")
+        print(newQuestion.id)
+        print(newQuestion.question)
+        print(newQuestion.answer)
+        print(newQuestion.category)
+        print(newQuestion.difficulty)
+        print("about to do the insert")
+        #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
+        newQuestion.insert()
+        print("just did the insert function")
+        return jsonify({
+          "success":True,
+          "created":newQuestion.id
+          })
+          
+      except:
+        print("something went wrong")
+        abort(422)
 
     
   
