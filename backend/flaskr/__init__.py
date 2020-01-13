@@ -141,21 +141,36 @@ def create_app(test_config=None):
     body = request.get_json()
 
     new_question = body.get('question',None)
+    print("new_question is",new_question)
     new_answer = body.get('answer',None)
     new_difficulty = body.get('difficulty',None)
-    new_category = body.get('category',None)
+    #new_category = body.get('category',None)
+    new_category = "Science"
+    #need to fix the above... as it turns out the category does need to be stored in the database as a string
 
     #need to convert the category to a number first?
 
     print("This is the body of the request",body)
 
     try:
-      newQuestion = Question(question=new_question,answer=new_answer,category=new_category,difficulty=new_difficulty)
+      newQuestion = Question(new_question, new_answer, new_category, new_difficulty)
       print("Here is the new question",newQuestion)
+      print("About to paste teh qualities of the question")
+      print(newQuestion.id)
+      print(newQuestion.question)
+      print(newQuestion.answer)
+      print(newQuestion.category)
+      print(newQuestion.difficulty)
+      print("about to do the insert")
+      #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
       newQuestion.insert()
+      print("just did the insert function")
+      formattedQ = newQuestion.format()
+      print("formatted Q is",formattedQ)
 
       return jsonify({
         "success":True,
+        "created":newQuestion.id
         })
         
     except:
