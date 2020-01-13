@@ -164,26 +164,30 @@ def create_app(test_config=None):
         })
 
     else:
+      print("there was no search term")
       body = request.get_json()
+      print("This is the body of the request",body)
       new_question = body.get('question',None)
       new_answer = body.get('answer',None)
       new_difficulty = body.get('difficulty',None)
       new_category = body.get('category',None)
+      print("This is what we are getting for category",new_category)
       
       #need to take the category received and convert it to the integrer that goes in the database
-      categoryID = Category.query.filter(Category.type==new_category).first().id 
-      print("The ID of the category for the added question is",categoryID)
+      #categoryy = Category.query.filter(Category.type==new_category).first()
+      #print(categoryy)
 
-      print("new_question is",new_question)
-      
+      #categoryID = categoryy.id 
+
+      #print("The ID of the category for the added question is",categoryID)
       #need to fix the above... as it turns out the category does need to be stored in the database as a string
 
       #need to convert the category to a number first?
 
-      print("This is the body of the request",body)
+     
 
       try:
-        newQuestion = Question(question=new_question, answer=new_answer, category=categoryID, difficulty=new_difficulty)
+        newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
         print("Here is the new question",newQuestion)
         print(newQuestion.id)
         print(newQuestion.question)
