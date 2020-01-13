@@ -124,12 +124,14 @@ def create_app(test_config=None):
   @app.route('/api/categories/<int:category_id>/questions',methods=['GET'])
   def qforcategory(category_id):
     print("This is the category id we are looking at",category_id)
-    selection = Question.query.filter(Category.id==category_id)
+    selection = Question.query.filter(Question.category==category_id)
+    #selection = Question.query.filter(Category.id==category_id)
+    #Why did above not work??> The artist and show one did, but is that because they are linked by a foregn key?
     #above query is not actually effectively querrying for category id... why?
-    
+    #print(Artist.query.filter(Artist.id==artistID, Shows.id==1)[0].name)
+
     for thing in selection:
       print(thing)
-    #print(Artist.query.filter(Artist.id==artistID, Shows.id==1)[0].name)
     print("This is the selection",selection[0].question)
     print("This is the selection",selection[1].question)
     current_questions = paginate_questions(request,selection)
@@ -148,8 +150,8 @@ def create_app(test_config=None):
   @app.route('/api/questions', methods=["POST"])
   def addQuestion():
     #initially had request fed into the function above, testing what happens if take it out
-    if query:
-      searchterm = request.get_json().get('query').value
+    if searchTerm:
+      searchterm = request.get_json().get('searchTerm')
       selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(searchterm)))
         #selection = Book.query.order_by(Book.id).filter(or_(Book.title.ilike('%{}%'.format(search)), Book.author.ilike('%{}%'.format(search))))
       current_questions = paginate_questions(request, selection)
