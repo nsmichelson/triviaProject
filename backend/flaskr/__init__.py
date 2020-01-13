@@ -149,6 +149,8 @@ def create_app(test_config=None):
   #STILL NEED TO FIX THIS ONE BELOW!!!!!!!!!
   @app.route('/api/questions', methods=["POST"])
   def addQuestion():
+    searchTerm = request.get_json().get('searchTerm')
+    print("Search term is",searchTerm)
     #initially had request fed into the function above, testing what happens if take it out
     if searchTerm:
       searchterm = request.get_json().get('searchTerm')
@@ -163,19 +165,17 @@ def create_app(test_config=None):
 
     else:
       body = request.get_json()
+      new_question = body.get('question',None)
+      new_answer = body.get('answer',None)
+      new_difficulty = body.get('difficulty',None)
+      new_category = body.get('category',None)
+      
+      #need to take the category received and convert it to the integrer that goes in the database
+      categoryID = Category.query.filter(Category.type==new_category).first().id 
+      print("The ID of the category for the added question is",categoryID)
 
-
-      new_question = "Bugsy???"
-      new_answer = "Amadeus??"
-      new_difficulty = 1
-
-
-      #new_question = body.get('question',None)
       print("new_question is",new_question)
-      #new_answer = body.get('answer',None)
-      #new_difficulty = body.get('difficulty',None)
-      #new_category = body.get('category',None)
-      new_category = "Science"
+      
       #need to fix the above... as it turns out the category does need to be stored in the database as a string
 
       #need to convert the category to a number first?
@@ -183,7 +183,7 @@ def create_app(test_config=None):
       print("This is the body of the request",body)
 
       try:
-        newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+        newQuestion = Question(question=new_question, answer=new_answer, category=categoryID, difficulty=new_difficulty)
         print("Here is the new question",newQuestion)
         print(newQuestion.id)
         print(newQuestion.question)
