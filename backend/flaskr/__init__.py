@@ -201,20 +201,17 @@ def create_app(test_config=None):
         print("Testing if formating works",newQuestion.format())
         print("about to do the insert")
         #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
-        try:
-          newQuestion.insert()
-          print("just did the insert function")
-          return jsonify({
-            "success":True,
-            "created":newQuestion.id
-            })
-        except:
-          print("Unexpected error:", sys.exc_info()[0])
-          raise
-          
+        newQuestion.insert()
+        print("just did the insert function")
+        return jsonify({
+          "success":True,
+          "created":newQuestion.id
+          })
       except:
         print("something went wrong")
-        abort(422)
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
+        #abort(422)
   
   
   @app.errorhandler(404)
