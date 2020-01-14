@@ -3,6 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+import sys
 
 from models import setup_db, Question, Category
 
@@ -169,8 +170,8 @@ def create_app(test_config=None):
       print("This is the body of the request",body)
       new_question = body.get('question',None)
       new_answer = body.get('answer',None)
-      new_difficulty = body.get('difficulty',None)
-      new_category = body.get('category',None)
+      new_difficulty = int(body.get('difficulty',None))
+      new_category = int(body.get('category',None))
       print("This is what we are getting for category",new_category)
       
       #need to take the category received and convert it to the integrer that goes in the database
@@ -189,19 +190,27 @@ def create_app(test_config=None):
       try:
         newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
         print("Here is the new question",newQuestion)
+        questionn = Question.query.filter(Question.id == 4).one_or_none()
+        print("here is a question that the functions worked on",questionn)
+        print(questionn.format())
         print(newQuestion.id)
-        print(newQuestion.question)
-        print(newQuestion.answer)
-        print(newQuestion.category)
-        print(newQuestion.difficulty)
+        print(type(newQuestion.question))
+        print(type(newQuestion.answer))
+        print(type(newQuestion.category))
+        print(type(newQuestion.difficulty))
+        print("Testing if formating works",newQuestion.format())
         print("about to do the insert")
         #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
-        newQuestion.insert()
-        print("just did the insert function")
-        return jsonify({
-          "success":True,
-          "created":newQuestion.id
-          })
+        try:
+          newQuestion.insert()
+          print("just did the insert function")
+          return jsonify({
+            "success":True,
+            "created":newQuestion.id
+            })
+        except:
+          print("Unexpected error:", sys.exc_info()[0])
+          raise
           
       except:
         print("something went wrong")
