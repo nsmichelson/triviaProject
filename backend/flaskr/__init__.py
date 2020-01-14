@@ -145,6 +145,43 @@ def create_app(test_config=None):
 
     })
 
+
+  '''
+    @TODO: 
+    Create a POST endpoint to get questions to play the quiz. 
+    This endpoint should take category and previous question parameters 
+    and return a random questions within the given category, 
+    if provided, and that is not one of the previous questions. 
+
+    TEST: In the "Play" tab, after a user selects "All" or a category,
+    one question at a time is displayed, the user is allowed to answer
+    and shown whether they were correct or not. 
+  '''
+
+  @app.route('/api/quizzes',methods=['POST'])
+  def quizMaker():
+    quiz_category = request.get_json().get('quiz_category')
+    print("The is what we are getting as the quiz category",quiz_category)
+    previous_questions = request.get_json().get('previous_questions')
+    print("These are the pervious questions",previous_questions)
+    print("testing for getting id",quiz_category['id'])
+    questions = Question.query.filter(Question.category == quiz_category['id']).order_by(Question.id).all() 
+    print("these are the filtered questions",questions)
+
+    questionOptions = []
+
+    for question in questions:
+      print("Here is a possible question",question)
+      if question.id not in previous_questions:
+        print(question.format())
+        questionOptions.append(question.format()) 
+
+    #qToAdd = Question.query.get(question.)
+
+    return jsonify({
+      "success":True,
+      "question": random.choice(questionOptions)
+    })
  
 
   #STILL NEED TO FIX THIS ONE BELOW!!!!!!!!!
