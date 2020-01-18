@@ -163,12 +163,18 @@ def create_app(test_config=None):
         questionOptions.append(question.format()) 
 
     #qToAdd = Question.query.get(question.)
+    if questionOptions:
+      return jsonify({
+        "success":True,
+        "question": random.choice(questionOptions)
+      })
+    #dealing with when run out of questions
+    else:
+      return jsonify({
+        "success":True,
+        "question": random.choice(questionOptions)
 
-    return jsonify({
-      "success":True,
-      "question": random.choice(questionOptions)
-    })
- 
+      })
 
   #STILL NEED TO FIX THIS ONE BELOW!!!!!!!!!
   @app.route('/api/questions', methods=["POST"])
@@ -204,12 +210,6 @@ def create_app(test_config=None):
         print("Here is the new question",newQuestion)
         questionn = Question.query.filter(Question.id == 4).one_or_none()
         print("here is a question that the functions worked on",questionn)
-        print(questionn.format())
-        print(newQuestion.id)
-        print(type(newQuestion.question))
-        print(type(newQuestion.answer))
-        print(type(newQuestion.category))
-        print(type(newQuestion.difficulty))
         print("Testing if formating works",newQuestion.format())
         print("about to do the insert")
         #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
