@@ -148,17 +148,16 @@ def create_app(test_config=None):
   @app.route('/api/quizzes',methods=['POST'])
   def quizMaker():
     quiz_category = request.get_json().get('quiz_category')
-    print("The is what we are getting as the quiz category",quiz_category)
     previous_questions = request.get_json().get('previous_questions')
-    print("These are the pervious questions",previous_questions)
-    print("testing for getting id",quiz_category['id'])
-    questions = Question.query.filter(Question.category == quiz_category['id']).order_by(Question.id).all() 
+    if quiz_category['id']:
+      questions = Question.query.filter(Question.category == quiz_category['id']).order_by(Question.id).all() 
+    else:
+      questions = Question.query.all()
     print("these are the filtered questions",questions)
 
     questionOptions = []
 
     for question in questions:
-      print("Here is a possible question",question)
       if question.id not in previous_questions:
         print(question.format())
         questionOptions.append(question.format()) 
@@ -198,17 +197,6 @@ def create_app(test_config=None):
       new_category = int(body.get('category',None))
       print("This is what we are getting for category",new_category)
       
-      #need to take the category received and convert it to the integrer that goes in the database
-      #categoryy = Category.query.filter(Category.type==new_category).first()
-      #print(categoryy)
-
-      #categoryID = categoryy.id 
-
-      #print("The ID of the category for the added question is",categoryID)
-      #need to fix the above... as it turns out the category does need to be stored in the database as a string
-
-      #need to convert the category to a number first?
-
      
 
       try:
