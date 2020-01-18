@@ -19,10 +19,6 @@ def paginate_questions(request, selection):
     formattedQ = Question.format(question)
     questions.append(formattedQ)
 
-
-  print("Here are all the questions",questions) 
-
-
   #questions = [Question.format() for question in selection]
   current_questions = questions[start:end]
 
@@ -47,14 +43,17 @@ def create_app(test_config=None):
   @app.route('/api/categories',methods=["GET"])
   def getCategories():
     categories = Category.query.order_by(Category.id).all()
-    print("categories are:",categories)
 
     CategoriesFormatted = []
     
     for category in categories:
       cleanCategory = Category.format(category)
       CategoriesFormatted.append(cleanCategory)
-      print(category.type)
+      print("categories formatted is",CategoriesFormatted)
+
+    other = {category.id : category.type for category in categories}
+    print("Other is",other)
+
 
     if categories is None:
       abort(404)
@@ -62,7 +61,7 @@ def create_app(test_config=None):
     return jsonify({
       "Success":True,
       "Total_Categories":len(Category.query.all()),
-      "categories":CategoriesFormatted
+      "categories":other
     })
 
   #GET request to retrieve all the trivia questions (for main page)
