@@ -166,13 +166,15 @@ def create_app(test_config=None):
     if questionOptions:
       return jsonify({
         "success":True,
-        "question": random.choice(questionOptions)
+        "question": random.choice(questionOptions),
+        "forceEnd": False
       })
     #dealing with when run out of questions
     else:
       return jsonify({
         "success":True,
-        "question": random.choice(questionOptions)
+        "question": '',
+        "forceEnd":True
 
       })
 
