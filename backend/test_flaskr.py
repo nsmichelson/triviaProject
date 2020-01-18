@@ -36,7 +36,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_getCategories(self):
         response = self.client().get('/api/categories')
 
-        data = response.json()
+        data = json.load(response)
 
         self.assertEqual(data['success'],True)
         self.assetTrue(data['categories'])
@@ -44,7 +44,7 @@ class TriviaTestCase(unittest.TestCase):
     #get cateogires successfully
     def test_getQuestions(self):
         response =self.client().get('/api/questions')
-        data = json.loads(response.data)
+        data = json.load(response.data)
 
         self.assertEqual(date['success'],True)
         self.assertTrue(date['questions'])
@@ -53,6 +53,7 @@ class TriviaTestCase(unittest.TestCase):
         random_q = random.choice([question.id for question in Question.query.all()])
         response = self.client().delete('api/questions/{}'.format(random_q))
 
+        data = json.load(response)
         self.assertEqual(["success"],True)
         self.assertTrue(data['questions'])
     #create a quiz
@@ -61,7 +62,7 @@ class TriviaTestCase(unittest.TestCase):
         random_category = random.choice([category.id for category in Category.query.all()])
         response = self.client().post('/api/quizzes',json={'previous_questions': [],'quiz_category': {'type': 'Art','id': '2'}})
 
-        data = json.loads(response.data)
+        data = json.load(response.data)
         self.assertEqual(data['success'],True)
         self.assertTrue(data['question'])
 
@@ -71,7 +72,7 @@ class TriviaTestCase(unittest.TestCase):
         qToAdd  = {'question':'Test','answer':'Test Answer','category':1,'difficulty':1}
         response=self.client().post('/api/questions',json=qToAdd)
 
-        data = json.loads(response.data)
+        data = json.load(response.data)
         self.assertEqual(data['success'],True)
         self.assertTrue(data['created'])
 
