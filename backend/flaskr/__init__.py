@@ -35,8 +35,6 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
-    #wondering if I need to add something here to allow the "include" for adding questions... will look into that
-    #and yep adding the last one above seemed to allow the question form to get submitted to server.. but whhhhy?
     return response
   
   #GET request to get a list of all the category names and their ids
@@ -82,8 +80,7 @@ def create_app(test_config=None):
     categories = Category.query.all()
       
     categoriesReturn = {category.id : category.type for category in categories} 
-    print("TEST")
-    print(categoriesReturn)
+
     return jsonify({
       "success":True,
       "questions": current_questions,
@@ -98,7 +95,6 @@ def create_app(test_config=None):
   def deleteQuestion(question_id):
     try:
       question = Question.query.filter(Question.id == question_id).one_or_none()
-      print("This is the question to delete")
       
       if question is None:
         abort(404)
@@ -107,7 +103,6 @@ def create_app(test_config=None):
       print("question was deleted")
 
       selection = Question.query.order_by(Question.id).all()
-      print("This is the selection",selection)
 
       current_questions = paginate_questions(request,selection)
 
@@ -125,15 +120,7 @@ def create_app(test_config=None):
   def qforcategory(category_id):
     print("This is the category id we are looking at",category_id)
     selection = Question.query.filter(Question.category==category_id)
-    #selection = Question.query.filter(Category.id==category_id)
-    #Why did above not work??> The artist and show one did, but is that because they are linked by a foregn key?
-    #above query is not actually effectively querrying for category id... why?
-    #print(Artist.query.filter(Artist.id==artistID, Shows.id==1)[0].name)
-
-    for thing in selection:
-      print(thing)
-    print("This is the selection",selection[0].question)
-    print("This is the selection",selection[1].question)
+    
     current_questions = paginate_questions(request,selection)
     for question in current_questions:
       print(question)
@@ -153,13 +140,11 @@ def create_app(test_config=None):
       questions = Question.query.filter(Question.category == quiz_category['id']).order_by(Question.id).all() 
     else:
       questions = Question.query.all()
-    print("these are the filtered questions",questions)
 
     questionOptions = []
 
     for question in questions:
       if question.id not in previous_questions:
-        print(question.format())
         questionOptions.append(question.format()) 
 
     #qToAdd = Question.query.get(question.)
@@ -178,12 +163,10 @@ def create_app(test_config=None):
 
       })
 
-  #STILL NEED TO FIX THIS ONE BELOW!!!!!!!!!
   @app.route('/api/questions', methods=["POST"])
   def addQuestion():
     searchTerm = request.get_json().get('searchTerm')
-    print("Search term is",searchTerm)
-    #initially had request fed into the function above, testing what happens if take it out
+ 
     if searchTerm:
       searchterm = request.get_json().get('searchTerm')
       selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(searchterm)))
@@ -198,25 +181,17 @@ def create_app(test_config=None):
     else:
       print("there was no search term")
       body = request.get_json()
-      print("This is the body of the request",body)
       new_question = body.get('question',None)
       new_answer = body.get('answer',None)
       new_difficulty = int(body.get('difficulty',None))
       new_category = int(body.get('category',None))
-      print("This is what we are getting for category",new_category)
-      
-     
 
       try:
         newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
-        print("Here is the new question",newQuestion)
         questionn = Question.query.filter(Question.id == 4).one_or_none()
-        print("here is a question that the functions worked on",questionn)
-        print("Testing if formating works",newQuestion.format())
-        print("about to do the insert")
         #The 422 error is coming from the below... need to look up the insert in sqlalchemy and see what's going on
         newQuestion.insert()
-        print("just did the insert function")
+
         return jsonify({
           "success":True,
           "created":newQuestion.id

@@ -25,12 +25,8 @@ class QuizView extends Component {
       url: `http://127.0.0.1:5000/api/categories`, //TODO: update request URL
       type: "GET",
       success: (result) => {
-        let categoryArray = [];
-        for (var key in result.categories){
-          console.log(result.categories[key]);
-          categoryArray.push(result.categories[key].type);
-        }
-        this.setState({ categories: categoryArray })
+        this.setState({ categories: result.categories })
+        console.log("result.categories is",result.categories);
         return;
       },
       error: (error) => {
