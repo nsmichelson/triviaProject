@@ -9,6 +9,7 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+#function to paginate questions into groups of 10
 def paginate_questions(request, selection):
   page = request.args.get('page', 1, type=int)
   start =  (page - 1) * QUESTIONS_PER_PAGE
@@ -19,7 +20,6 @@ def paginate_questions(request, selection):
     formattedQ = Question.format(question)
     questions.append(formattedQ)
 
-  #questions = [Question.format() for question in selection]
   current_questions = questions[start:end]
 
   return current_questions
@@ -116,6 +116,7 @@ def create_app(test_config=None):
       abort(422)
 
 
+  #route to look up the questions from one particular category
   @app.route('/api/categories/<int:category_id>/questions',methods=['GET'])
   def qforcategory(category_id):
     print("This is the category id we are looking at",category_id)
@@ -132,6 +133,7 @@ def create_app(test_config=None):
     })
 
 
+  #route to generate a quiz based on a category of choosing
   @app.route('/api/quizzes',methods=['POST'])
   def quizMaker():
     quiz_category = request.get_json().get('quiz_category')
@@ -163,6 +165,7 @@ def create_app(test_config=None):
 
       })
 
+  #
   @app.route('/api/questions', methods=["POST"])
   def addQuestion():
     searchTerm = request.get_json().get('searchTerm')
@@ -170,7 +173,6 @@ def create_app(test_config=None):
     if searchTerm:
       searchterm = request.get_json().get('searchTerm')
       selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(searchterm)))
-        #selection = Book.query.order_by(Book.id).filter(or_(Book.title.ilike('%{}%'.format(search)), Book.author.ilike('%{}%'.format(search))))
       current_questions = paginate_questions(request, selection)
       
       return jsonify({
