@@ -108,10 +108,10 @@ def create_app(test_config=None):
 
             current_questions = paginate_questions(request,selection)
 
-          return jsonify({
-              "success":True,
-              "questions":current_questions
-              })
+            return jsonify({
+                "success":True,
+                "questions":current_questions
+                })
         except:
             abort(422)
 
@@ -170,10 +170,10 @@ def create_app(test_config=None):
             selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(searchterm)))
             current_questions = paginate_questions(request, selection)
             
-          return jsonify({
-              'success': True,
-              'questions': current_questions
-              })
+            return jsonify({
+                'success': True,
+                'questions': current_questions
+                })
 
         else:
             body = request.get_json()
@@ -182,21 +182,21 @@ def create_app(test_config=None):
             new_difficulty = int(body.get('difficulty',None))
             new_category = int(body.get('category',None))
 
-          try:
-              newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
-              questionn = Question.query.filter(Question.id == 4).one_or_none()
-              newQuestion.insert()
+            try:
+                newQuestion = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+                questionn = Question.query.filter(Question.id == 4).one_or_none()
+                newQuestion.insert()
 
-              return jsonify({
-                  "success":True,
-                  "created":newQuestion.id
-                  })
-          except:
-              print("something went wrong")
-              print("Unexpected error:", sys.exc_info()[0])
-              raise
-              #abort(422)
-    
+                return jsonify({
+                    "success":True,
+                    "created":newQuestion.id
+                    })
+            except:
+                print("something went wrong")
+                print("Unexpected error:", sys.exc_info()[0])
+                raise
+                #abort(422)
+        
     
     @app.errorhandler(404)
     def not_found(error):
@@ -222,7 +222,7 @@ def create_app(test_config=None):
             "message": "bad request"
             }), 400
 
-      
+    
     
     
     return app
